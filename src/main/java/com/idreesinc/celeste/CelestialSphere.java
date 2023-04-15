@@ -71,7 +71,7 @@ public class CelestialSphere {
         BukkitRunnable fallingStarTask = red ? new RedFallingStar(celeste, location) : new FallingStar(celeste, target);
         fallingStarTask.runTaskTimer(celeste, 0, 1);
         if (config.debug) {
-            celeste.getLogger().info("Falling star at " + stringifyLocation(target) + " in world " + target.getWorld().getName());
+            celeste.getLogger().info("Falling star at " + stringifyLocation(target) + "(origin="+stringifyLocation(location)+")" + " in world " + target.getWorld().getName() + ". Red="+red);
         }
     }
 

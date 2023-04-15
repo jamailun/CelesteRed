@@ -139,6 +139,10 @@ public class RedFallingStar extends FallingStar {
             });
         });
     
+        if(config.debug) {
+            System.out.println("transform duration = " + config.redFallingTransform.duration + ". Ticks = " + ((long) (20d * config.redFallingTransform.duration)));
+        }
+        
         CelesteRed.runLater(() -> {
             Collection<BlockState> dbs = transformations.keySet().stream()
                             .map(loc -> loc.getBlock().getState())
@@ -150,7 +154,7 @@ public class RedFallingStar extends FallingStar {
                             player.sendBlockChanges(dbs, true);
                         });
                     });
-        }, 20L * 5);
+        }, (long) (20d * config.redFallingTransform.duration));
     }
     
 }

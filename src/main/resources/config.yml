@@ -64,6 +64,7 @@ red-falling-stars:
     enabled: true
     radius-max: 5
     chance: 0.55
+    duration: 25
     blocks:
       MAGMA_BLOCK: 60
       OBSIDIAN: 30

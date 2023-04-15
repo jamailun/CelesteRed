@@ -12,6 +12,7 @@ public class TransformModuleConfig {
 	public boolean enabled;
 	public double radiusMax;
 	public double chance;
+	public double duration;
 	public WeightedRandomBag<Material> possibilities;
 	
 	public void buildFromConfigurationSection(@Nullable ConfigurationSection section) {
@@ -22,6 +23,7 @@ public class TransformModuleConfig {
 		enabled = section.getBoolean("enabled");
 		radiusMax = section.getDouble("radius-max");
 		chance = section.getDouble("chance");
+		duration = section.getDouble("duration");
 		possibilities = calculatePossibilities(section.getConfigurationSection("blocks"));
 	}
 	
@@ -30,6 +32,7 @@ public class TransformModuleConfig {
 			enabled = section.getBoolean("enabled", global.enabled);
 			radiusMax = section.getDouble("radius-max", global.radiusMax);
 			chance = section.getDouble("chance", global.chance);
+			duration = section.getDouble("duration", global.duration);
 			if(section.isSet("blocks")) {
 				possibilities = calculatePossibilities(section.getConfigurationSection("blocks"));
 			} else {
@@ -39,6 +42,7 @@ public class TransformModuleConfig {
 			enabled = global.enabled;
 			radiusMax = global.radiusMax;
 			chance = global.chance;
+			duration = global.duration;
 			possibilities = global.possibilities;
 		}
 	}
