@@ -29,7 +29,7 @@ public class CommandFallingStar implements CommandExecutor {
                 sender.sendMessage(ChatColor.RED + "Error: Player not found.");
                 return true;
             }
-            CelestialSphere.createFallingStar(celeste, target, false);
+            CelestialSphere.createFallingStar(celeste, target, red, false);
         } else {
             if (sender instanceof Player) {
                 target = (Player) sender;

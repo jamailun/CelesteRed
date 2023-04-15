@@ -19,7 +19,7 @@ falling-stars:
   enabled: true
   per-minute: 0.2
   per-minute-during-meteor-showers: 0.3
-  radius: 10
+  radius: 55
   sound-enabled: true
   volume: 6
   spark-time: 200
@@ -35,7 +35,7 @@ red-falling-stars:
   enabled: true
   per-minute: 0.5
   per-minute-during-meteor-showers: 0.1
-  radius: 50
+  radius: 25
   summon-text: "&cRun!"
   # Mobs that can spawn from a red falling star
   mobs:
@@ -56,6 +56,15 @@ red-falling-stars:
   # Fire properties
   fire:
     enabled: true
-    radius-min: 1.5
-    radius-max: 4.8
+    radius-min: 2
+    radius-max: 5
+    chance: 0.35
+  # Transform properties
+  transform:
+    enabled: true
+    radius-max: 5
     chance: 0.55
+    blocks:
+      MAGMA_BLOCK: 60
+      OBSIDIAN: 30
+      CRYING_OBSIDIAN: 10

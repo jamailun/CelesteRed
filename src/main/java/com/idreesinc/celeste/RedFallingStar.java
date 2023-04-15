@@ -1,19 +1,28 @@
 package com.idreesinc.celeste;
 
 import com.idreesinc.celeste.config.MobConfiguration;
+import com.idreesinc.celeste.utilities.WeightedRandomBag;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class RedFallingStar extends FallingStar {
     
@@ -21,23 +30,44 @@ public class RedFallingStar extends FallingStar {
         super(celeste, location);
     }
     
+    private final static Sound[] SOUNDS_BEFORE = new Sound[] {
+            Sound.AMBIENT_BASALT_DELTAS_MOOD,
+            Sound.AMBIENT_CRIMSON_FOREST_MOOD,
+            Sound.AMBIENT_SOUL_SAND_VALLEY_MOOD
+    };
+    
+    private final static Sound[] SOUNDS_ARRIVAL = new Sound[] {
+            Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM,
+            Sound.ENTITY_ALLAY_AMBIENT_WITH_ITEM,
+            Sound.ENTITY_ALLAY_DEATH,
+            Sound.ENTITY_ALLAY_ITEM_TAKEN
+    };
+    
     @Override
-    protected Sound getSound() {
-        return Sound.BLOCK_BELL_RESONATE;
+    protected void playSoundStart(float volume) {
+        Sound sound = SOUNDS_BEFORE[RANDOM.nextInt(SOUNDS_BEFORE.length)];
+        world.playSound(dropLoc, sound, volume, 0.55f);
     }
     
     @Override
-    protected Particle getParticle() {
-        return Particle.FIREWORKS_SPARK;
+    protected void playSoundDrop(float volume) {
+        Sound sound = SOUNDS_ARRIVAL[RANDOM.nextInt(SOUNDS_ARRIVAL.length)];
+        world.playSound(dropLoc, sound, volume, 0.55f);
+    }
+    
+    @Override
+    protected void spawnParticle(double y, double offsetY, double speed) {
+        Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255, 15, 15), 1);
+        world.spawnParticle(Particle.REDSTONE, location.getX(), y, location.getZ(), 0, 0, 0, 0, dust);
     }
 
     @Override
     protected void dropLoots() {
-        location.getWorld().playSound(dropLoc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, (float) config.fallingStarsVolume, 0.5f);
+        world.playSound(dropLoc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, (float) config.fallingStarsVolume, 0.5f);
         MobConfiguration mob = config.redFallingStarsMobs.getRandom();
         if(mob != null) {
             mob.spawn(dropLoc);
-            location.getWorld().spawnParticle(
+            world.spawnParticle(
                     Particle.SMOKE_LARGE,
                     dropLoc.getX(), dropLoc.getY(), dropLoc.getZ(),
                     12,
@@ -45,12 +75,20 @@ public class RedFallingStar extends FallingStar {
                     .8
             );
         }
+        Collection<Block> sphere = null;
+        
         // fire
-        if(config.redFallingFire.fireEnabled) {
-            createFire(dropLoc, config.redFallingFire.fireRadiusMin, config.redFallingFire.fireRadiusMax, config.redFallingFire.fireChance);
+        if(config.redFallingFire.enabled) {
+            sphere = blocksInSphere(dropLoc, config.redFallingFire.radiusMax);
+            createFire(sphere, config.redFallingFire.radiusMin, config.redFallingFire.chance);
         }
         
-        // blocs around
+        // blocks around
+        if(config.redFallingTransform.enabled) {
+            if(!config.redFallingFire.enabled || config.redFallingFire.radiusMax != config.redFallingTransform.radiusMax)
+                sphere = blocksInSphere(dropLoc, config.redFallingTransform.radiusMax);
+            transformBlocks(sphere, config.redFallingTransform.chance, config.redFallingTransform.possibilities);
+        }
     }
     
     private Collection<Block> blocksInSphere(@NotNull Location center, double radius) {
@@ -74,15 +112,45 @@ public class RedFallingStar extends FallingStar {
     
     private static final Random RANDOM = new Random();
     
-    private void createFire(Location center, double minRadius, double maxRadius, double percentage) {
-        Collection<Block> allInSphere = blocksInSphere(center, maxRadius);
+    private void createFire(Collection<Block> allInSphere, final double minRadius, final double chance) {
         allInSphere.stream()
-                .filter(b -> b.getType() == Material.AIR || b.getType() == Material.CAVE_AIR || b.getType() == Material.VOID_AIR)
-                .filter(b -> b.getLocation().toVector().distance(dropLoc.toVector()) >= minRadius)
+                .filter(b -> b.getType().isAir())
+                .filter(b -> b.getLocation().distance(dropLoc) >= minRadius)
                 .forEach(b -> {
-                    if(RANDOM.nextDouble() <= percentage)
+                    if(RANDOM.nextDouble() <= chance)
                         b.setType(Material.FIRE);
                 });
+    }
+    
+    @SuppressWarnings("deprecated")
+    private void transformBlocks(Collection<Block> allInSphere, double chance, WeightedRandomBag<Material> possibilities) {
+        Set<Player> players = world.getPlayers().stream().filter(p -> p.getLocation().distance(dropLoc) < 100).collect(Collectors.toSet());
+        Map<Location, BlockData> transformations = new HashMap<>();
+        allInSphere.stream()
+                .filter(b -> b.getType().isOccluding() && !b.getType().isInteractable() && !b.getType().isAir())
+                .forEach(b -> {
+                    if(RANDOM.nextDouble() <= chance) {
+                        transformations.put(b.getLocation(), CelesteRed.createBlockData(possibilities.getRandom()));
+                    }
+                });
+        transformations.forEach((loc, data) -> {
+            players.forEach(player -> {
+                player.sendBlockChange(loc, data);
+            });
+        });
+    
+        CelesteRed.runLater(() -> {
+            Collection<BlockState> dbs = transformations.keySet().stream()
+                            .map(loc -> loc.getBlock().getState())
+                            .collect(Collectors.toSet());
+            players.stream()
+                    .filter(Entity::isValid)
+                    .forEach(player -> {
+                        transformations.forEach((loc, type) -> {
+                            player.sendBlockChanges(dbs, true);
+                        });
+                    });
+        }, 20L * 5);
     }
     
 }

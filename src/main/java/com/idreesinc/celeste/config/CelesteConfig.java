@@ -37,6 +37,7 @@ public class CelesteConfig {
     public WeightedRandomBag<MobConfiguration> redFallingStarsMobs;
     public String redFallingStarsMessage;
     public FireModuleConfig redFallingFire = new FireModuleConfig();
+    public TransformModuleConfig redFallingTransform = new TransformModuleConfig();
 
     public CelesteConfig(ConfigurationSection section) {
         // Used to build the global config
@@ -90,7 +91,8 @@ public class CelesteConfig {
         redFallingStarsRadius = redFalling.getInt("radius");
         redFallingStarsMobs = calculateMobs(redFalling.getConfigurationSection("mobs"));
         redFallingStarsMessage = redFalling.getString("summon-text");
-        redFallingFire.loadFromConfigurationSection(redFalling.getConfigurationSection("fire"));
+        redFallingFire.buildFromConfigurationSection(redFalling.getConfigurationSection("fire"));
+        redFallingTransform.buildFromConfigurationSection(redFalling.getConfigurationSection("transform"));
     }
 
     private void buildFromConfigurationSectionWithGlobal(ConfigurationSection section, CelesteConfig globalConfig) {
@@ -163,6 +165,7 @@ public class CelesteConfig {
                 redFallingStarsMobs = globalConfig.redFallingStarsMobs;
             }
             redFallingFire.buildFromConfigurationSectionWithGlobal(redFalling.getConfigurationSection("fire"), globalConfig.redFallingFire);
+            redFallingTransform.buildFromConfigurationSectionWithGlobal(redFalling.getConfigurationSection("transform"), globalConfig.redFallingTransform);
         } else {
             redFallingStarsEnabled = globalConfig.redFallingStarsEnabled;
             redFallingStarsPerMinute = globalConfig.redFallingStarsPerMinute;
@@ -171,6 +174,7 @@ public class CelesteConfig {
             redFallingStarsMessage = globalConfig.redFallingStarsMessage;
             redFallingStarsMobs = globalConfig.redFallingStarsMobs;
             redFallingFire = globalConfig.redFallingFire;
+            redFallingTransform = globalConfig.redFallingTransform;
         }
     }
 

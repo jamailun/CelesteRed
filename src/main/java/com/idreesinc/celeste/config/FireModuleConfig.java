@@ -6,34 +6,34 @@ import org.jetbrains.annotations.Nullable;
 
 public class FireModuleConfig {
 	
-	public boolean fireEnabled;
-	public double fireRadiusMin;
-	public double fireRadiusMax;
-	public double fireChance;
+	public boolean enabled;
+	public double radiusMin;
+	public double radiusMax;
+	public double chance;
 	
-	public void loadFromConfigurationSection(@Nullable ConfigurationSection section) {
+	public void buildFromConfigurationSection(@Nullable ConfigurationSection section) {
 		if(section == null) {
-			fireEnabled = false;
+			enabled = false;
 			return;
 		}
-		fireEnabled = section.getBoolean("enabled");
-		fireRadiusMin = section.getDouble("radius-min");
-		fireRadiusMax = section.getDouble("radius-max");
-		fireChance = section.getDouble("chance");
+		enabled = section.getBoolean("enabled");
+		radiusMin = section.getDouble("radius-min");
+		radiusMax = section.getDouble("radius-max");
+		chance = section.getDouble("chance");
 		
 	}
 	
 	public void buildFromConfigurationSectionWithGlobal(@Nullable ConfigurationSection section, @NotNull FireModuleConfig global) {
 		if(section != null) {
-			fireEnabled = section.getBoolean("enabled", global.fireEnabled);
-			fireRadiusMin = section.getDouble("radius-min", global.fireRadiusMin);
-			fireRadiusMax = section.getDouble("radius-max", global.fireRadiusMax);
-			fireChance = section.getDouble("chance", global.fireChance);
+			enabled = section.getBoolean("enabled", global.enabled);
+			radiusMin = section.getDouble("radius-min", global.radiusMin);
+			radiusMax = section.getDouble("radius-max", global.radiusMax);
+			chance = section.getDouble("chance", global.chance);
 		} else {
-			fireEnabled = global.fireEnabled;
-			fireRadiusMin = global.fireRadiusMin;
-			fireRadiusMax = global.fireRadiusMax;
-			fireChance = global.fireChance;
+			enabled = global.enabled;
+			radiusMin = global.radiusMin;
+			radiusMax = global.radiusMax;
+			chance = global.chance;
 		}
 	}
 }

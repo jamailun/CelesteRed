@@ -52,17 +52,9 @@ public class CelestialSphere {
             celeste.getLogger().info("Shooting star at " + stringifyLocation(starLocation) + " in world " + starLocation.getWorld().getName());
         }
     }
-
-    public static void createFallingStar(CelesteRed celeste, Player player, boolean red) {
-        createFallingStar(celeste, player, red, true);
-    }
     
     public static void createFallingStar(CelesteRed celeste, Player player, boolean red, boolean approximate) {
         createFallingStar(celeste, player.getLocation(), red, approximate);
-    }
-
-    public static void createFallingStar(CelesteRed celeste, final Location location, boolean red) {
-        createFallingStar(celeste, location, red, true);
     }
 
     public static void createFallingStar(CelesteRed celeste, final Location location, boolean red, boolean approximate) {
@@ -78,7 +70,7 @@ public class CelestialSphere {
         }
         BukkitRunnable fallingStarTask = red ? new RedFallingStar(celeste, location) : new FallingStar(celeste, target);
         fallingStarTask.runTaskTimer(celeste, 0, 1);
-        if (celeste.getConfig().getBoolean("debug")) {
+        if (config.debug) {
             celeste.getLogger().info("Falling star at " + stringifyLocation(target) + " in world " + target.getWorld().getName());
         }
     }

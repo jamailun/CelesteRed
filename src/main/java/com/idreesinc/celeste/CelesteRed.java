@@ -2,6 +2,8 @@ package com.idreesinc.celeste;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -14,10 +16,12 @@ import java.util.Objects;
 
 public class CelesteRed extends JavaPlugin {
 
+    private static CelesteRed instance;
     public CelesteConfigManager configManager = new CelesteConfigManager(this);
 
     @Override
     public void onEnable() {
+        instance = this;
         this.saveDefaultConfig();
     
         configManager.processConfigs();
@@ -39,5 +43,13 @@ public class CelesteRed extends JavaPlugin {
     public static void logError(String s) {
         Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Celeste" + ChatColor.DARK_RED + "Red" + ChatColor.RED + "] " + s);
     }
+    
+    public static void runLater(Runnable runnable, long time) {
+        Bukkit.getScheduler().runTaskLater(instance, runnable, time);
+    }
 
+    public static BlockData createBlockData(Material material) {
+        return instance.getServer().createBlockData(material);
+    }
+    
 }
