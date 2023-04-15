@@ -13,19 +13,19 @@ import java.util.Random;
 
 public class CelestialSphere {
 
-    public static void createShootingStar(Celeste celeste, Player player) {
+    public static void createShootingStar(CelesteRed celeste, Player player) {
         createShootingStar(celeste, player, true);
     }
 
-    public static void createShootingStar(Celeste celeste, Player player, boolean approximate) {
+    public static void createShootingStar(CelesteRed celeste, Player player, boolean approximate) {
         createShootingStar(celeste, player.getLocation(), approximate);
     }
 
-    public static void createShootingStar(Celeste celeste, Location location) {
+    public static void createShootingStar(CelesteRed celeste, Location location) {
         createShootingStar(celeste, location, true);
     }
 
-    public static void createShootingStar(Celeste celeste, Location location, boolean approximate) {
+    public static void createShootingStar(CelesteRed celeste, Location location, boolean approximate) {
         Location starLocation;
         CelesteConfig config = celeste.configManager.getConfigForWorld(location.getWorld().getName());
         double w = 100 * Math.sqrt(new Random().nextDouble());
@@ -53,19 +53,19 @@ public class CelestialSphere {
         }
     }
 
-    public static void createFallingStar(Celeste celeste, Player player) {
-        createFallingStar(celeste, player, true);
+    public static void createFallingStar(CelesteRed celeste, Player player, boolean red) {
+        createFallingStar(celeste, player, red, true);
+    }
+    
+    public static void createFallingStar(CelesteRed celeste, Player player, boolean red, boolean approximate) {
+        createFallingStar(celeste, player.getLocation(), red, approximate);
     }
 
-    public static void createFallingStar(Celeste celeste, Player player, boolean approximate) {
-        createFallingStar(celeste, player.getLocation(), approximate);
+    public static void createFallingStar(CelesteRed celeste, final Location location, boolean red) {
+        createFallingStar(celeste, location, red, true);
     }
 
-    public static void createFallingStar(Celeste celeste, final Location location) {
-        createFallingStar(celeste, location, true);
-    }
-
-    public static void createFallingStar(Celeste celeste, final Location location, boolean approximate) {
+    public static void createFallingStar(CelesteRed celeste, final Location location, boolean red, boolean approximate) {
         Location target = location;
         CelesteConfig config = celeste.configManager.getConfigForWorld(location.getWorld().getName());
         if (approximate) {
@@ -76,7 +76,7 @@ public class CelestialSphere {
             double z = w * Math.sin(t);
             target = new Location(location.getWorld(), location.getX() + x, location.getY(), location.getZ() + z);
         }
-        BukkitRunnable fallingStarTask = new FallingStar(celeste, target);
+        BukkitRunnable fallingStarTask = red ? new RedFallingStar(celeste, location) : new FallingStar(celeste, target);
         fallingStarTask.runTaskTimer(celeste, 0, 1);
         if (celeste.getConfig().getBoolean("debug")) {
             celeste.getLogger().info("Falling star at " + stringifyLocation(target) + " in world " + target.getWorld().getName());

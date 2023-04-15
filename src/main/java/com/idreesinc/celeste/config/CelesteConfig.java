@@ -1,20 +1,24 @@
 package com.idreesinc.celeste.config;
 
+import com.idreesinc.celeste.CelesteRed;
 import com.idreesinc.celeste.utilities.WeightedRandomBag;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.Nullable;
 
 public class CelesteConfig {
     public boolean newMoonMeteorShower;
     public int beginSpawningStarsTime;
     public int endSpawningStarsTime;
+    public boolean debug;
 
     public boolean shootingStarsEnabled;
     public double shootingStarsPerMinute;
     public double shootingStarsPerMinuteMeteorShower;
     public int shootingStarsMinHeight;
     public int shootingStarsMaxHeight;
-
+    public String shootingStarsMessage;
+    
     public boolean fallingStarsEnabled;
     public double fallingStarsPerMinute;
     public double fallingStarsPerMinuteMeteorShower;
@@ -24,7 +28,14 @@ public class CelesteConfig {
     public int fallingStarsSparkTime;
     public int fallingStarsExperience;
     public WeightedRandomBag<String> fallingStarSimpleLoot;
-    public String fallingStarLootTable;
+    public String fallingStarsMessage;
+    
+    public boolean redFallingStarsEnabled;
+    public double redFallingStarsPerMinute;
+    public double redFallingStarsPerMinuteMeteorShower;
+    public int redFallingStarsRadius;
+    public WeightedRandomBag<MobConfiguration> redFallingStarsMobs;
+    public String redFallingStarsMessage;
 
     public CelesteConfig(ConfigurationSection section) {
         // Used to build the global config
@@ -37,67 +48,132 @@ public class CelesteConfig {
     }
 
     private void buildFromConfigurationSection(ConfigurationSection section) {
-        newMoonMeteorShower = section.getBoolean("new-moon-meteor-shower");
-        beginSpawningStarsTime = section.getInt("begin-spawning-stars-time");
-        endSpawningStarsTime = section.getInt("end-spawning-stars-time");
-
-        shootingStarsEnabled = section.getBoolean("shooting-stars-enabled");
-        shootingStarsPerMinute = section.getDouble("shooting-stars-per-minute");
-        shootingStarsPerMinuteMeteorShower = section.getDouble("shooting-stars-per-minute-during-meteor-showers");
-        shootingStarsMinHeight = section.getInt("shooting-stars-min-height");
-        shootingStarsMaxHeight = section.getInt("shooting-stars-max-height");
-
-        fallingStarsEnabled = section.getBoolean("falling-stars-enabled");
-        fallingStarsPerMinute = section.getDouble("falling-stars-per-minute");
-        fallingStarsPerMinuteMeteorShower = section.getDouble("falling-stars-per-minute-during-meteor-showers");
-        fallingStarsRadius = section.getInt("falling-stars-radius");
-        fallingStarsSoundEnabled = section.getBoolean("falling-stars-sound-enabled");
-        fallingStarsVolume = section.getDouble("falling-stars-volume");
-        fallingStarsSparkTime = section.getInt("falling-stars-spark-time");
-        fallingStarsExperience = section.getInt("falling-stars-experience");
-
-        fallingStarLootTable = section.getString("falling-stars-loot-table");
-        if (section.isSet("falling-stars-loot")) {
-            fallingStarSimpleLoot = calculateSimpleLoot(section.getConfigurationSection("falling-stars-loot"));
+        ConfigurationSection general = section.getConfigurationSection("general");
+        ConfigurationSection shooting = section.getConfigurationSection("shooting-stars");
+        ConfigurationSection falling = section.getConfigurationSection("falling-stars");
+        ConfigurationSection redFalling = section.getConfigurationSection("red-falling-stars");
+        if(general == null || shooting == null || falling == null || redFalling == null) {
+            CelesteRed.logError("Invalid config.");
+            throw new RuntimeException("Bad configuration for celeste.");
         }
+        // Genegral configuration
+        newMoonMeteorShower = general.getBoolean("new-moon-meteor-shower");
+        beginSpawningStarsTime = general.getInt("begin-spawning-stars-time");
+        endSpawningStarsTime = general.getInt("end-spawning-stars-time");
+        debug = general.getBoolean("debug");
+
+        // Shooting star
+        shootingStarsEnabled = shooting.getBoolean("enabled");
+        shootingStarsPerMinute = shooting.getDouble("per-minute");
+        shootingStarsPerMinuteMeteorShower = shooting.getDouble("per-minute-during-meteor-showers");
+        shootingStarsMinHeight = shooting.getInt("min-height");
+        shootingStarsMaxHeight = shooting.getInt("max-height");
+        shootingStarsMessage = shooting.getString("summon-text");
+
+        // Falling stars
+        fallingStarsEnabled = falling.getBoolean("enabled");
+        fallingStarsPerMinute = falling.getDouble("per-minute");
+        fallingStarsPerMinuteMeteorShower = falling.getDouble("per-minute-during-meteor-showers");
+        fallingStarsRadius = falling.getInt("radius");
+        fallingStarsSoundEnabled = falling.getBoolean("sound-enabled");
+        fallingStarsVolume = falling.getDouble("volume");
+        fallingStarsSparkTime = falling.getInt("spark-time");
+        fallingStarsExperience = falling.getInt("experience");
+        fallingStarSimpleLoot = calculateSimpleLoot(falling.getConfigurationSection("loots"));
+        fallingStarsMessage = falling.getString("summon-text");
+        
+        // Red falling stars
+        redFallingStarsEnabled = redFalling.getBoolean("enabled");
+        redFallingStarsPerMinute = redFalling.getDouble("per-minute");
+        redFallingStarsPerMinuteMeteorShower= redFalling.getDouble("per-minute-during-meteor-showers");
+        redFallingStarsRadius = redFalling.getInt("radius");
+        redFallingStarsMobs = calculateMobs(redFalling.getConfigurationSection("mobs"));
+        redFallingStarsMessage = redFalling.getString("summon-text");
     }
 
     private void buildFromConfigurationSectionWithGlobal(ConfigurationSection section, CelesteConfig globalConfig) {
-        newMoonMeteorShower = section.getBoolean("new-moon-meteor-shower", globalConfig.newMoonMeteorShower);
-        beginSpawningStarsTime = section.getInt("begin-spawning-stars-time", globalConfig.beginSpawningStarsTime);
-        endSpawningStarsTime = section.getInt("end-spawning-stars-time", globalConfig.endSpawningStarsTime);
-
-        shootingStarsEnabled = section.getBoolean("shooting-stars-enabled", globalConfig.shootingStarsEnabled);
-        shootingStarsPerMinute = section.getDouble("shooting-stars-per-minute", globalConfig.shootingStarsPerMinute);
-        shootingStarsPerMinuteMeteorShower = section.getDouble("shooting-stars-per-minute-during-meteor-showers", globalConfig.shootingStarsPerMinuteMeteorShower);
-        shootingStarsMinHeight = section.getInt("shooting-stars-min-height", globalConfig.shootingStarsMinHeight);
-        shootingStarsMaxHeight = section.getInt("shooting-stars-max-height", globalConfig.shootingStarsMaxHeight);
-
-        fallingStarsEnabled = section.getBoolean("falling-stars-enabled", globalConfig.fallingStarsEnabled);
-        fallingStarsPerMinute = section.getDouble("falling-stars-per-minute", globalConfig.fallingStarsPerMinute);
-        fallingStarsPerMinuteMeteorShower = section.getDouble("falling-stars-per-minute-during-meteor-showers", globalConfig.fallingStarsPerMinuteMeteorShower);
-        fallingStarsRadius = section.getInt("falling-stars-radius", globalConfig.fallingStarsRadius);
-        fallingStarsSoundEnabled = section.getBoolean("falling-stars-sound-enabled", globalConfig.fallingStarsSoundEnabled);
-        fallingStarsVolume = section.getDouble("falling-stars-volume", globalConfig.fallingStarsVolume);
-        fallingStarsSparkTime = section.getInt("falling-stars-spark-time", globalConfig.fallingStarsSparkTime);
-        fallingStarsExperience = section.getInt("falling-stars-experience", globalConfig.fallingStarsExperience);
-
-        if (section.isSet("falling-stars-loot") || section.isSet("falling-stars-loot-table")) {
-            // Ensure that neither type of loot is inherited from the global config if any overrides are used
-            // This means that even if the global config sets simple loot and the world config overrides just loot
-            // table, the end result will be a config with the loot table set and the simple table empty
-            fallingStarLootTable = section.getString("falling-stars-loot-table");
-            if (section.isSet("falling-stars-loot")) {
-                fallingStarSimpleLoot = calculateSimpleLoot(section.getConfigurationSection("falling-stars-loot"));
+        ConfigurationSection general = section.getConfigurationSection("general");
+        ConfigurationSection shooting = section.getConfigurationSection("shooting-stars");
+        ConfigurationSection falling = section.getConfigurationSection("falling-stars");
+        ConfigurationSection redFalling = section.getConfigurationSection("red-falling-stars");
+        
+        if(general != null) {
+            newMoonMeteorShower = general.getBoolean("new-moon-meteor-shower", globalConfig.newMoonMeteorShower);
+            beginSpawningStarsTime = general.getInt("begin-spawning-stars-time", globalConfig.beginSpawningStarsTime);
+            endSpawningStarsTime = general.getInt("end-spawning-stars-time", globalConfig.endSpawningStarsTime);
+        } else {
+            newMoonMeteorShower = globalConfig.newMoonMeteorShower;
+            beginSpawningStarsTime = globalConfig.beginSpawningStarsTime;
+            endSpawningStarsTime = globalConfig.endSpawningStarsTime;
+        }
+        
+        if(shooting != null) {
+            shootingStarsEnabled = shooting.getBoolean("enabled", globalConfig.shootingStarsEnabled);
+            shootingStarsPerMinute = shooting.getDouble("per-minute", globalConfig.shootingStarsPerMinute);
+            shootingStarsPerMinuteMeteorShower = shooting.getDouble("per-minute-during-meteor-showers", globalConfig.shootingStarsPerMinuteMeteorShower);
+            shootingStarsMinHeight = shooting.getInt("min-height", globalConfig.shootingStarsMinHeight);
+            shootingStarsMaxHeight = shooting.getInt("max-height", globalConfig.shootingStarsMaxHeight);
+        } else {
+            shootingStarsEnabled = globalConfig.shootingStarsEnabled;
+            shootingStarsPerMinute = globalConfig.shootingStarsPerMinute;
+            shootingStarsPerMinuteMeteorShower = globalConfig.shootingStarsPerMinuteMeteorShower;
+            shootingStarsMinHeight = globalConfig.shootingStarsMinHeight;
+            shootingStarsMaxHeight = globalConfig.shootingStarsMaxHeight;
+        }
+        
+        if(falling != null) {
+            fallingStarsEnabled = falling.getBoolean("enabled", globalConfig.fallingStarsEnabled);
+            fallingStarsPerMinute = falling.getDouble("per-minute", globalConfig.fallingStarsPerMinute);
+            fallingStarsPerMinuteMeteorShower = falling.getDouble("per-minute-during-meteor-showers", globalConfig.fallingStarsPerMinuteMeteorShower);
+            fallingStarsRadius = falling.getInt("radius", globalConfig.fallingStarsRadius);
+            fallingStarsSoundEnabled = falling.getBoolean("sound-enabled", globalConfig.fallingStarsSoundEnabled);
+            fallingStarsVolume = falling.getDouble("volume", globalConfig.fallingStarsVolume);
+            fallingStarsSparkTime = falling.getInt("spark-time", globalConfig.fallingStarsSparkTime);
+            fallingStarsExperience = falling.getInt("experience", globalConfig.fallingStarsExperience);
+            ConfigurationSection loots = falling.getConfigurationSection("loots");
+            if(loots != null) {
+                fallingStarSimpleLoot = calculateSimpleLoot(loots);
+            } else {
+                fallingStarSimpleLoot = globalConfig.fallingStarSimpleLoot;
             }
         } else {
-            fallingStarLootTable = globalConfig.fallingStarLootTable;
+            fallingStarsEnabled = globalConfig.fallingStarsEnabled;
+            fallingStarsPerMinute = globalConfig.fallingStarsPerMinute;
+            fallingStarsPerMinuteMeteorShower = globalConfig.fallingStarsPerMinuteMeteorShower;
+            fallingStarsRadius = globalConfig.fallingStarsRadius;
+            fallingStarsSoundEnabled = globalConfig.fallingStarsSoundEnabled;
+            fallingStarsVolume = globalConfig.fallingStarsVolume;
+            fallingStarsSparkTime = globalConfig.fallingStarsSparkTime;
+            fallingStarsExperience = globalConfig.fallingStarsExperience;
             fallingStarSimpleLoot = globalConfig.fallingStarSimpleLoot;
+        }
+
+        if(redFalling != null) {
+            redFallingStarsEnabled = redFalling.getBoolean("enabled", globalConfig.redFallingStarsEnabled);
+            redFallingStarsPerMinute = redFalling.getDouble("per-minute", globalConfig.redFallingStarsPerMinute);
+            redFallingStarsPerMinuteMeteorShower = redFalling.getDouble("per-minute-during-meteor-showers", globalConfig.redFallingStarsPerMinuteMeteorShower);
+            redFallingStarsRadius = redFalling.getInt("radius", globalConfig.redFallingStarsRadius);
+            redFallingStarsMessage = redFalling.getString("summon-text", globalConfig.redFallingStarsMessage);
+            ConfigurationSection mobs = redFalling.getConfigurationSection("mobs");
+            if(mobs != null) {
+                redFallingStarsMobs = calculateMobs(mobs);
+            } else {
+                redFallingStarsMobs = globalConfig.redFallingStarsMobs;
+            }
+        } else {
+            redFallingStarsEnabled = globalConfig.redFallingStarsEnabled;
+            redFallingStarsPerMinute = globalConfig.redFallingStarsPerMinute;
+            redFallingStarsPerMinuteMeteorShower = globalConfig.redFallingStarsPerMinuteMeteorShower;
+            redFallingStarsRadius = globalConfig.redFallingStarsRadius;
+            redFallingStarsMessage = globalConfig.redFallingStarsMessage;
+            redFallingStarsMobs = globalConfig.redFallingStarsMobs;
         }
     }
 
-    public WeightedRandomBag<String> calculateSimpleLoot(ConfigurationSection loot) {
+    public WeightedRandomBag<String> calculateSimpleLoot(@Nullable ConfigurationSection loot) {
         WeightedRandomBag<String> fallingStarDrops = new WeightedRandomBag<>();
+        if(loot == null)
+            return fallingStarDrops;
         for (String key : loot.getKeys(false)) {
             try {
                 Material.valueOf(key.toUpperCase());
@@ -107,5 +183,20 @@ public class CelesteConfig {
             }
         }
         return fallingStarDrops;
+    }
+    
+    public WeightedRandomBag<MobConfiguration> calculateMobs(@Nullable ConfigurationSection mobs) {
+        WeightedRandomBag<MobConfiguration> redMobs = new WeightedRandomBag<>();
+        if(mobs == null)
+            return redMobs;
+        
+        for(String mobId : mobs.getKeys(false)) {
+            ConfigurationSection mc = mobs.getConfigurationSection(mobId);
+            if(mc != null) {
+                MobConfiguration mob = new MobConfiguration(mc);
+                redMobs.addEntry(mob, mc.getDouble("chance", 1.0 / mobs.getKeys(false).size()));
+            }
+        }
+        return redMobs;
     }
 }

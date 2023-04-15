@@ -9,9 +9,9 @@ import java.util.Random;
 
 public class Astronomer extends BukkitRunnable {
 
-    private final Celeste celeste;
+    private final CelesteRed celeste;
 
-    public Astronomer(Celeste celeste) {
+    public Astronomer(CelesteRed celeste) {
         this.celeste = celeste;
     }
 
@@ -27,33 +27,45 @@ public class Astronomer extends BukkitRunnable {
                 // Ensure that Celeste only runs on normal worlds unless override is specified in config
                 continue;
             }
-            if (world.getPlayers().size() == 0) {
+            if (world.getPlayers().isEmpty()) {
                 continue;
             }
             if (!(world.getTime() >= config.beginSpawningStarsTime && world.getTime() <= config.endSpawningStarsTime)) {
                 continue;
             }
-            if (world.hasStorm()) {
-                continue;
-            }
 
             double shootingStarChance;
             double fallingStarChance;
+            double redFallingStarChance;
             if (config.newMoonMeteorShower && (world.getFullTime() / 24000) % 8 == 4) {
                 shootingStarChance = config.shootingStarsPerMinuteMeteorShower / 120d;
                 fallingStarChance = config.fallingStarsPerMinuteMeteorShower / 120d;
+                redFallingStarChance = config.redFallingStarsPerMinuteMeteorShower / 120d;
             } else {
                 shootingStarChance = config.shootingStarsPerMinute / 120d;
                 fallingStarChance = config.fallingStarsPerMinute / 120d;
+                redFallingStarChance = config.redFallingStarsPerMinute / 120d;
             }
 
-            if (config.shootingStarsEnabled && new Random().nextDouble() <= shootingStarChance) {
-                CelestialSphere.createShootingStar(celeste,
-                        world.getPlayers().get(new Random().nextInt(world.getPlayers().size())));
+            if (config.shootingStarsEnabled && new Random().nextDouble() <= shootingStarChance && ! world.hasStorm()) {
+                CelestialSphere.createShootingStar(
+                        celeste,
+                        world.getPlayers().get(new Random().nextInt(world.getPlayers().size()))
+                );
             }
-            if (config.fallingStarsEnabled && new Random().nextDouble() <=  fallingStarChance) {
-                CelestialSphere.createFallingStar(celeste,
-                        world.getPlayers().get(new Random().nextInt(world.getPlayers().size())));
+            if (config.fallingStarsEnabled && new Random().nextDouble() <=  fallingStarChance && ! world.hasStorm()) {
+                CelestialSphere.createFallingStar(
+                        celeste,
+                        world.getPlayers().get(new Random().nextInt(world.getPlayers().size())),
+                        false
+                );
+            }
+            if (config.redFallingStarsEnabled && new Random().nextDouble() <=  redFallingStarChance) {
+                CelestialSphere.createFallingStar(
+                        celeste,
+                        world.getPlayers().get(new Random().nextInt(world.getPlayers().size())),
+                        true
+                );
             }
         }
     }

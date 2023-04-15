@@ -1,39 +1,43 @@
 package com.idreesinc.celeste.commands;
 
-import com.idreesinc.celeste.Celeste;
+import com.idreesinc.celeste.CelesteRed;
 import com.idreesinc.celeste.CelestialSphere;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class CommandShootingStar implements CommandExecutor {
 
-    Celeste celeste;
+    private final CelesteRed celeste;
 
-    public CommandShootingStar(Celeste celeste) {
+    public CommandShootingStar(CelesteRed celeste) {
         this.celeste = celeste;
     }
 
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        Player target;
         if (args.length > 0) {
-            if (Bukkit.getPlayer(args[0]) == null) {
-                sender.sendMessage("\u00a7cError: Player not found.");
+            target = Bukkit.getPlayer(args[0]);
+            if (target == null) {
+                sender.sendMessage(ChatColor.RED + "Error: Player not found.");
                 return true;
             }
-            CelestialSphere.createShootingStar(celeste, Bukkit.getPlayer(args[0]), false);
+            CelestialSphere.createShootingStar(celeste, target, false);
         } else {
             if (sender instanceof Player) {
-                Player player = (Player) sender;
-                CelestialSphere.createShootingStar(celeste, player, false);
+                target = (Player) sender;
+                CelestialSphere.createShootingStar(celeste, target, false);
             } else {
                 return false;
             }
         }
-        String message = this.celeste.getConfig().getString("shooting-stars-summon-text");
+        String message = celeste.configManager.getConfigForWorld(target.getWorld().getName()).shootingStarsMessage;
         if (message != null) {
-            sender.sendMessage(message);
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         }
         return true;
     }

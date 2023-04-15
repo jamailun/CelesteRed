@@ -1,6 +1,6 @@
 package com.idreesinc.celeste.config;
 
-import com.idreesinc.celeste.Celeste;
+import com.idreesinc.celeste.CelesteRed;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -9,11 +9,11 @@ import java.util.Map;
 
 public class CelesteConfigManager {
 	
-	private final Celeste celeste;
+	private final CelesteRed celeste;
 	private final Map<String, CelesteConfig> worldConfigs = new HashMap<>();
 	private CelesteConfig globalConfig;
 
-	public CelesteConfigManager(Celeste celeste) {
+	public CelesteConfigManager(CelesteRed celeste) {
 		this.celeste = celeste;
 	}
 	

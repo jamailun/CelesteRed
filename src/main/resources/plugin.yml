@@ -1,8 +1,8 @@
-name: Celeste
-version: 2.0
-api-version: 1.14
-author: Idrees
-main: com.idreesinc.celeste.Celeste
+name: CelesteRed
+version: 1.0
+api-version: 1.19
+authors: [Idrees, jamailun]
+main: com.idreesinc.celeste.CelesteRed
 
 commands:
   celeste:
@@ -16,6 +16,10 @@ commands:
     description: Creates a falling star near the player that summons it, or optionally near another player
     usage: /<command> [player]
     permission: celeste.fallingstar
+  redfallingstar:
+    description: Creates a RED falling star near the player that summons it, or optionally near another player
+    usage: /<command> [player]
+    permission: celeste.redfallingstar
 
 permissions:
   celeste.*:
@@ -25,6 +29,7 @@ permissions:
       celeste.info: true
       celeste.shootingstar: true
       celeste.fallingstar: true
+      celeste.redfallingstar: true
   celeste.reload:
     description: Allows you to reload the plugin config values
   celeste.info:
@@ -33,3 +38,5 @@ permissions:
     description: Allows you to summon shooting stars
   celeste.fallingstar:
     description: Allows you to summon falling stars
+  celeste.redfallingstar:
+    description: Allows you to summon red falling stars

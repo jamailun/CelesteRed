@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class WeightedRandomBag<T extends Object> {
-
+public class WeightedRandomBag<T> {
+    
+    private static final Random RANDOM = new Random();
     private class Entry {
         double accumulatedWeight;
         T object;
     }
 
-    public List<Entry> entries = new ArrayList<Entry>();
+    public List<Entry> entries = new ArrayList<>();
     private double accumulatedWeight;
-    private Random rand = new Random();
 
     public void addEntry(T object, double weight) {
         accumulatedWeight += weight;
@@ -25,7 +25,7 @@ public class WeightedRandomBag<T extends Object> {
     }
 
     public T getRandom() {
-        double r = rand.nextDouble() * accumulatedWeight;
+        double r = RANDOM.nextDouble() * accumulatedWeight;
         for (Entry entry: entries) {
             if (entry.accumulatedWeight >= r) {
                 return entry.object;
