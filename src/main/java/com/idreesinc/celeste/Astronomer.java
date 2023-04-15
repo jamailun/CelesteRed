@@ -57,6 +57,7 @@ public class Astronomer extends BukkitRunnable {
                 CelestialSphere.createFallingStar(
                         celeste,
                         world.getPlayers().get(new Random().nextInt(world.getPlayers().size())),
+                        false,
                         false
                 );
             }
@@ -64,7 +65,8 @@ public class Astronomer extends BukkitRunnable {
                 CelestialSphere.createFallingStar(
                         celeste,
                         world.getPlayers().get(new Random().nextInt(world.getPlayers().size())),
-                        true
+                        true,
+                        false
                 );
             }
         }

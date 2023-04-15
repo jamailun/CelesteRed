@@ -69,7 +69,7 @@ public class CelestialSphere {
         Location target = location;
         CelesteConfig config = celeste.configManager.getConfigForWorld(location.getWorld().getName());
         if (approximate) {
-            double fallingStarRadius = config.fallingStarsRadius;
+            double fallingStarRadius = red ? config.redFallingStarsRadius : config.fallingStarsRadius;
             double w = fallingStarRadius * Math.sqrt(new Random().nextDouble());
             double t = 2d * Math.PI * new Random().nextDouble();
             double x = w * Math.cos(t);
