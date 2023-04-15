@@ -37,6 +37,7 @@ red-falling-stars:
   per-minute-during-meteor-showers: 0.1
   radius: 50
   summon-text: "&cRun!"
+  # Mobs that can spawn from a red falling star
   mobs:
     mob_1:
       name: "Wither de rancœur"
@@ -52,3 +53,9 @@ red-falling-stars:
             - name: FIRE_ASPECT
               level: 1
           droppable: false
+  # Fire properties
+  fire:
+    enabled: true
+    radius-min: 1.5
+    radius-max: 4.8
+    chance: 0.55

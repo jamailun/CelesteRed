@@ -36,6 +36,7 @@ public class CelesteConfig {
     public int redFallingStarsRadius;
     public WeightedRandomBag<MobConfiguration> redFallingStarsMobs;
     public String redFallingStarsMessage;
+    public FireModuleConfig redFallingFire = new FireModuleConfig();
 
     public CelesteConfig(ConfigurationSection section) {
         // Used to build the global config
@@ -89,6 +90,7 @@ public class CelesteConfig {
         redFallingStarsRadius = redFalling.getInt("radius");
         redFallingStarsMobs = calculateMobs(redFalling.getConfigurationSection("mobs"));
         redFallingStarsMessage = redFalling.getString("summon-text");
+        redFallingFire.loadFromConfigurationSection(redFalling.getConfigurationSection("fire"));
     }
 
     private void buildFromConfigurationSectionWithGlobal(ConfigurationSection section, CelesteConfig globalConfig) {
@@ -160,6 +162,7 @@ public class CelesteConfig {
             } else {
                 redFallingStarsMobs = globalConfig.redFallingStarsMobs;
             }
+            redFallingFire.buildFromConfigurationSectionWithGlobal(redFalling.getConfigurationSection("fire"), globalConfig.redFallingFire);
         } else {
             redFallingStarsEnabled = globalConfig.redFallingStarsEnabled;
             redFallingStarsPerMinute = globalConfig.redFallingStarsPerMinute;
@@ -167,6 +170,7 @@ public class CelesteConfig {
             redFallingStarsRadius = globalConfig.redFallingStarsRadius;
             redFallingStarsMessage = globalConfig.redFallingStarsMessage;
             redFallingStarsMobs = globalConfig.redFallingStarsMobs;
+            redFallingFire = globalConfig.redFallingFire;
         }
     }
 
