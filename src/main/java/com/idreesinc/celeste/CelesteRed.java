@@ -25,8 +25,10 @@ public class CelesteRed extends JavaPlugin {
         this.saveDefaultConfig();
     
         configManager.processConfigs();
-
-        Objects.requireNonNull(this.getCommand("celeste")).setExecutor(new CommandCeleste(this));
+    
+        CommandCeleste commandCeleste = new CommandCeleste(this);
+        Objects.requireNonNull(this.getCommand("celeste")).setExecutor(commandCeleste);
+        Objects.requireNonNull(this.getCommand("celeste")).setTabCompleter(commandCeleste);
         Objects.requireNonNull(this.getCommand("shootingstar")).setExecutor(new CommandShootingStar(this));
         Objects.requireNonNull(this.getCommand("fallingstar")).setExecutor(new CommandFallingStar(this, false));
         Objects.requireNonNull(this.getCommand("redfallingstar")).setExecutor(new CommandFallingStar(this, true));

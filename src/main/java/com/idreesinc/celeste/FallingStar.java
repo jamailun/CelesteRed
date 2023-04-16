@@ -46,7 +46,7 @@ public class FallingStar extends BukkitRunnable {
     
     protected void spawnParticle(double y, double offsetY, double speed) {
         world.spawnParticle(Particle.FIREWORKS_SPARK, location.getX(), y, location.getZ(),
-                1,
+                0,
                 0, offsetY, 0,
                 speed, null, true);
     }

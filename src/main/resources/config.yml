@@ -59,6 +59,7 @@ red-falling-stars:
     radius-min: 2
     radius-max: 5
     chance: 0.35
+    duration: 30
   # Transform properties
   transform:
     enabled: true

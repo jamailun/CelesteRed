@@ -57,8 +57,11 @@ public class RedFallingStar extends FallingStar {
     
     @Override
     protected void spawnParticle(double y, double offsetY, double speed) {
-        Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255, 15, 15), 1);
-        world.spawnParticle(Particle.REDSTONE, location.getX(), y, location.getZ(), 0, 0, 0, 0, dust);
+        Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 2);
+        world.spawnParticle(Particle.REDSTONE, location.getX(), y, location.getZ(),
+                0,
+                0, offsetY, 0,
+                speed, dust, true);
     }
 
     @Override
@@ -113,13 +116,21 @@ public class RedFallingStar extends FallingStar {
     private static final Random RANDOM = new Random();
     
     private void createFire(Collection<Block> allInSphere, final double minRadius, final double chance) {
-        allInSphere.stream()
+        Set<Block> fireBlock = allInSphere.stream()
                 .filter(b -> b.getType().isAir())
                 .filter(b -> b.getLocation().distance(dropLoc) >= minRadius)
-                .forEach(b -> {
-                    if(RANDOM.nextDouble() <= chance)
-                        b.setType(Material.FIRE);
-                });
+                .filter(b -> RANDOM.nextDouble() <= chance)
+                .peek(b -> b.setType(Material.FIRE))
+                .collect(Collectors.toSet());
+    
+        if(config.redFallingFire.duration <= 0)
+            return;
+        
+        CelesteRed.runLater(() -> {
+            fireBlock.stream()
+                    .filter(b -> b.getType() == Material.FIRE)
+                    .forEach(b -> b.setType(Material.AIR));
+        }, (long) (20d * config.redFallingFire.duration));
     }
     
     @SuppressWarnings("deprecated")
@@ -138,10 +149,6 @@ public class RedFallingStar extends FallingStar {
                 player.sendBlockChange(loc, data);
             });
         });
-    
-        if(config.debug) {
-            System.out.println("transform duration = " + config.redFallingTransform.duration + ". Ticks = " + ((long) (20d * config.redFallingTransform.duration)));
-        }
         
         CelesteRed.runLater(() -> {
             Collection<BlockState> dbs = transformations.keySet().stream()

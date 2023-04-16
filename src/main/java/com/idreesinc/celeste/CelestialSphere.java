@@ -21,10 +21,6 @@ public class CelestialSphere {
         createShootingStar(celeste, player.getLocation(), approximate);
     }
 
-    public static void createShootingStar(CelesteRed celeste, Location location) {
-        createShootingStar(celeste, location, true);
-    }
-
     public static void createShootingStar(CelesteRed celeste, Location location, boolean approximate) {
         Location starLocation;
         CelesteConfig config = celeste.configManager.getConfigForWorld(location.getWorld().getName());
@@ -68,7 +64,7 @@ public class CelestialSphere {
             double z = w * Math.sin(t);
             target = new Location(location.getWorld(), location.getX() + x, location.getY(), location.getZ() + z);
         }
-        BukkitRunnable fallingStarTask = red ? new RedFallingStar(celeste, location) : new FallingStar(celeste, target);
+        BukkitRunnable fallingStarTask = red ? new RedFallingStar(celeste, target) : new FallingStar(celeste, target);
         fallingStarTask.runTaskTimer(celeste, 0, 1);
         if (config.debug) {
             celeste.getLogger().info("Falling star at " + stringifyLocation(target) + "(origin="+stringifyLocation(location)+")" + " in world " + target.getWorld().getName() + ". Red="+red);
@@ -78,6 +74,6 @@ public class CelestialSphere {
     private static String stringifyLocation(Location location) {
         DecimalFormat format = new DecimalFormat("##.00");
         format.setRoundingMode(RoundingMode.HALF_UP);
-        return "x: " + format.format(location.getX()) + " y: " + format.format(location.getY()) + " z: " + format.format(location.getZ());
+        return "(" + format.format(location.getX()) + ", " + format.format(location.getY()) + ", " + format.format(location.getZ()) + ")";
     }
 }
