@@ -19,7 +19,10 @@ import java.util.stream.Collectors;
 public class CommandCeleste implements CommandExecutor, TabCompleter {
     
     private static final List<String> ARGS = Arrays.asList("reload", "info", "set");
-    private static final List<String> ARGS_SET = Arrays.asList("shooting_stars", "falling_stars", "red_falling_stars");
+    private static final List<String> ARGS_SET = Arrays.asList(
+            "new_moon_meteor_shower", "shooting_stars", "falling_stars", "red_falling_stars",
+            "red_falling_stars.fire", "red_falling_stars.transform"
+    );
     private static final List<String> ARGS_ON_OFF = Arrays.asList("enable", "disable");
     
     private final CelesteRed celeste;
@@ -72,16 +75,41 @@ public class CommandCeleste implements CommandExecutor, TabCompleter {
                 sender.sendMessage(ChatColor.RED + "Syntax : /"+label+" set [module] [enable/disable]");
                 return true;
             }
-            if(!ARGS_SET.contains(args[1])) {
-                sender.sendMessage(ChatColor.RED + "Unknown module : '" + args[1] + "'");
-                return true;
-            }
             if(!ARGS_ON_OFF.contains(args[2])) {
                 sender.sendMessage(ChatColor.RED + "Unknown value : '" + args[2] + "'. Allowed values: [enable, disable]");
                 return true;
             }
-    
-            sender.sendMessage(ChatColor.GRAY + "todo");
+            
+            String worldName = (sender instanceof Player) ? ((Player)sender).getWorld().getName() : "";
+            CelesteConfig config = celeste.configManager.getConfigForWorld(worldName);
+            
+            boolean enabled = args[2].equals("enable");
+            switch(args[1]) {
+                case "new_moon_meteor_shower":
+                    config.newMoonMeteorShower = enabled;
+                    break;
+                case "shooting_stars":
+                    config.shootingStarsEnabled = enabled;
+                    break;
+                case "falling_stars":
+                    config.fallingStarsEnabled = enabled;
+                    break;
+                case "red_falling_stars":
+                    config.redFallingStarsEnabled = enabled;
+                    break;
+                case "red_falling_stars.fire":
+                    config.redFallingFire.enabled = enabled;
+                    break;
+                case "red_falling_stars.transform":
+                    config.redFallingTransform.enabled = enabled;
+                    break;
+                default:
+                    sender.sendMessage(ChatColor.RED + "Unknown module : '" + args[1] + "'");
+                    return true;
+            }
+            celeste.configManager.saveChanges(worldName);
+            sender.sendMessage(ChatColor.GREEN + "Celeste config updated."
+                    + ChatColor.GRAY + " ["+ args[1] + "] = " + getEnableString(enabled) + ChatColor.GRAY + ".");
             
             return true;
         }

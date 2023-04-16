@@ -4,6 +4,7 @@ import com.idreesinc.celeste.CelesteRed;
 import com.idreesinc.celeste.utilities.WeightedRandomBag;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CelesteConfig {
@@ -177,8 +178,15 @@ public class CelesteConfig {
             redFallingTransform = globalConfig.redFallingTransform;
         }
     }
-
-    public WeightedRandomBag<String> calculateSimpleLoot(@Nullable ConfigurationSection loot) {
+    
+    public void saveEnables(ConfigurationSection root) {
+        root.getConfigurationSection("general").set("new-moon-meteor-shower", newMoonMeteorShower);
+        root.getConfigurationSection("shooting-stars").set("enabled", shootingStarsEnabled);
+        root.getConfigurationSection("falling-stars").set("enabled", fallingStarsEnabled);
+        root.getConfigurationSection("red-falling-stars").set("enabled", redFallingStarsEnabled);
+    }
+    
+    private WeightedRandomBag<String> calculateSimpleLoot(@Nullable ConfigurationSection loot) {
         WeightedRandomBag<String> fallingStarDrops = new WeightedRandomBag<>();
         if(loot == null)
             return fallingStarDrops;
@@ -193,7 +201,7 @@ public class CelesteConfig {
         return fallingStarDrops;
     }
     
-    public WeightedRandomBag<MobConfiguration> calculateMobs(@Nullable ConfigurationSection mobs) {
+    private WeightedRandomBag<MobConfiguration> calculateMobs(@Nullable ConfigurationSection mobs) {
         WeightedRandomBag<MobConfiguration> redMobs = new WeightedRandomBag<>();
         if(mobs == null)
             return redMobs;
@@ -207,4 +215,5 @@ public class CelesteConfig {
         }
         return redMobs;
     }
+    
 }

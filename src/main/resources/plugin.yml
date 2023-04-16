@@ -7,7 +7,7 @@ main: com.idreesinc.celeste.CelesteRed
 commands:
   celeste:
     description: Reloads the plugin configuration or prints runtime info
-    usage: /<command> <reload|info>
+    usage: /<command> <reload|info|set <module> <state>>
   shootingstar:
     description: Creates a shooting star near the player that summons it, or optionally near another player
     usage: /<command> [player]
@@ -27,11 +27,14 @@ permissions:
     children:
       celeste.reload: true
       celeste.info: true
+      celeste.set: true
       celeste.shootingstar: true
       celeste.fallingstar: true
       celeste.redfallingstar: true
   celeste.reload:
     description: Allows you to reload the plugin config values
+  celeste.set:
+    description: Allows you enable or disable some functionalities directly in-game.
   celeste.info:
     description: Allows you to view the plugin info
   celeste.shootingstar:

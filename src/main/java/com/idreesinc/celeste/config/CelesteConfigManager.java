@@ -34,6 +34,20 @@ public class CelesteConfigManager {
 			}
 		}
 	}
+	
+	public void saveChanges(String worldName) {
+		CelesteConfig cc = globalConfig;
+		ConfigurationSection root = this.celeste.getConfig();
+		if(worldName != null && doesWorldHaveOverrides(worldName)) {
+			cc = getConfigForWorld(worldName);
+			ConfigurationSection over = root.getConfigurationSection("world-overrides");
+			if(over != null && over.isSet(worldName))
+				root = over.getConfigurationSection(worldName);
+		}
+		assert root != null;
+		cc.saveEnables(root);
+		this.celeste.saveConfig();
+	}
 
 	/**
 	 * Get the config for the given world name (case-sensitive) or the global config if no overrides have been added
